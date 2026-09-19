@@ -1,26 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0d07;
+  --surface: #111407;
+  --gaming-accent: #ff6600;
+  --gaming-accent-2: #ffc200;
+  --military-green: #3a4a1e;
+  --military-olive: #6b7c3a;
+  --military-khaki: #8a8c6a;
+  --pakistan-green: #01411C;
+  --pakistan-light: #1a7a3a;
+  --crescent-gold: #d4aa3c;
+  --text-primary: #e8e8d0;
+  --text-muted: #7a7a5a;
+  --glass: rgba(20, 26, 10, 0.75);
+  --glass-border: rgba(100, 120, 50, 0.3);
+  --danger: #cc2200;
+  --team-a: #1a5fff;
+  --team-b: #ff2200;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-foreground: var(--text-primary);
+  --color-gaming-accent: var(--gaming-accent);
+  --color-gaming-accent-2: var(--gaming-accent-2);
+  --color-military-green: var(--military-green);
+  --color-military-olive: var(--military-olive);
+  --color-military-khaki: var(--military-khaki);
+  --color-pakistan-green: var(--pakistan-green);
+  --color-pakistan-light: var(--pakistan-light);
+  --color-crescent-gold: var(--crescent-gold);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+  --color-team-a: var(--team-a);
+  --color-team-b: var(--team-b);
+  --font-sans: 'Rajdhani', 'Geist', system-ui, sans-serif;
+  --font-mono: 'Share Tech Mono', 'Geist Mono', monospace;
+  --font-display: 'Orbitron', sans-serif;
+  --font-urdu: 'Noto Nastaliq Urdu', serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ─── BASE ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  background-image:
+    /* hex grid overlay */
+    radial-gradient(circle at 20% 80%, rgba(58, 74, 30, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(100, 60, 10, 0.12) 0%, transparent 50%),
+    /* subtle camo noise */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  letter-spacing: 0.02em;
 }
+
+/* ─── MILITARY GRID LINES ─────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(100, 120, 50, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 120, 50, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── GLASS PANELS ─────────────────────────────── */
+.glass-panel {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(14px);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Corner bracket accents */
+.glass-panel::before,
+.glass-panel::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--gaming-accent);
+  border-style: solid;
+  opacity: 0.6;
+}
+.glass-panel::before { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.glass-panel::after  { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+/* ─── TYPOGRAPHY ───────────────────────────────── */
+.font-display { font-family: var(--font-display); }
+.font-mono    { font-family: var(--font-mono); }
+
+/* ─── GLITCH TEXT ──────────────────────────────── */
+@keyframes glitch {
+  0%   { clip-path: inset(40% 0 61% 0); transform: translate(-2px, 0); }
+  20%  { clip-path: inset(92% 0 1% 0);  transform: translate(2px, 0); }
+  40%  { clip-path: inset(43% 0 1% 0);  transform: translate(0, 0); }
+  60%  { clip-path: inset(25% 0 58% 0); transform: translate(2px, 0); }
+  80%  { clip-path: inset(54% 0 7% 0);  transform: translate(-2px, 0); }
+  100% { clip-path: inset(58% 0 43% 0); transform: translate(0, 0); }
+}
+
+.glitch {
+  position: relative;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.glitch:hover::before {
+  opacity: 0.7;
+  color: #ff6600;
+  animation: glitch 0.3s linear infinite alternate-reverse;
+}
+.glitch:hover::after {
+  opacity: 0.5;
+  color: #00aaff;
+  animation: glitch 0.3s linear 0.1s infinite alternate;
+}
+
+/* ─── FLICKER ──────────────────────────────────── */
+@keyframes flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96%           { opacity: 0.85; }
+  97%           { opacity: 1; }
+  98%           { opacity: 0.7; }
+}
+.flicker { animation: flicker 5s infinite; }
+
+/* ─── PULSE GLOW ───────────────────────────────── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 102, 0, 0.4); }
+  50%       { box-shadow: 0 0 20px rgba(255, 102, 0, 0.9), 0 0 40px rgba(255, 102, 0, 0.3); }
+}
+.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* ─── SCAN LINE SWEEP ──────────────────────────── */
+@keyframes scan {
+  0%   { top: -10%; }
+  100% { top: 110%; }
+}
+.scan-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.scan-sweep::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(transparent, rgba(180, 220, 80, 0.15), transparent);
+  animation: scan 3s linear infinite;
+  pointer-events: none;
+}
+
+/* ─── TEAM CARDS ───────────────────────────────── */
+.team-card-a {
+  background: linear-gradient(135deg, rgba(20, 40, 120, 0.5), rgba(10, 20, 60, 0.8));
+  border: 1px solid rgba(30, 95, 255, 0.4);
+  box-shadow: inset 0 0 30px rgba(30, 95, 255, 0.05), 0 0 20px rgba(30, 95, 255, 0.1);
+}
+.team-card-b {
+  background: linear-gradient(135deg, rgba(120, 20, 20, 0.5), rgba(60, 10, 10, 0.8));
+  border: 1px solid rgba(255, 34, 0, 0.4);
+  box-shadow: inset 0 0 30px rgba(255, 34, 0, 0.05), 0 0 20px rgba(255, 34, 0, 0.1);
+}
+
+/* ─── RATING BAR ──────────────────────────────── */
+.rating-bar {
+  height: 3px;
+  background: linear-gradient(90deg, var(--military-olive), var(--gaming-accent));
+  box-shadow: 0 0 6px rgba(255, 102, 0, 0.6);
+  border-radius: 2px;
+}
+
+/* ─── BUTTONS ──────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #cc4400, #ff6600);
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 140, 50, 0.5);
+  box-shadow: 0 0 15px rgba(255, 102, 0, 0.3), inset 0 1px 0 rgba(255,200,100,0.2);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #ee5500, #ff8800);
+  box-shadow: 0 0 25px rgba(255, 102, 0, 0.6), inset 0 1px 0 rgba(255,200,100,0.3);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+
+/* ─── TABLE ROWS ────────────────────────────────── */
+.war-table tr:hover td { background: rgba(100, 120, 50, 0.08); }
+
+/* ─── INPUT FIELDS ──────────────────────────────── */
+.war-input {
+  background: rgba(10, 15, 5, 0.8);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.war-input:focus {
+  border-color: var(--gaming-accent);
+  box-shadow: 0 0 8px rgba(255, 102, 0, 0.3);
+}
+
+/* ─── SCROLLBAR ─────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--military-olive); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gaming-accent); }
+
+/* ─── BADGE ─────────────────────────────────────── */
+.badge-active   { background: rgba(50,100,20,0.4); color: #88dd44; border: 1px solid rgba(80,160,30,0.4); }
+.badge-inactive { background: rgba(100,20,20,0.4); color: #dd4444; border: 1px solid rgba(160,30,30,0.4); }

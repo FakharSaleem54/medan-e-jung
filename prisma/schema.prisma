@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Player {
+  id          String        @id @default(uuid())
+  displayName String
+  nickname    String?
+  avatar      String?
+  active      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  matches     MatchPlayer[]
+}
+
+model Match {
+  id            String        @id @default(uuid())
+  mode          String
+  screenshotUrl String?
+  playedAt      DateTime      @default(now())
+  createdAt     DateTime      @default(now())
+  createdBy     String?
+  notes         String?
+  players       MatchPlayer[]
+}
+
+model MatchPlayer {
+  id       String @id @default(uuid())
+  matchId  String
+  playerId String
+  kills    Int
+  deaths   Int
+  kd       Float
+  team     String? // "A", "B", etc.
+
+  match  Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+}
+
+model TeamGeneration {
+  id               String   @id @default(uuid())
+  createdAt        DateTime @default(now())
+  players          String   // JSON string of player IDs
+  teamA            String   // JSON string of player IDs
+  teamB            String   // JSON string of player IDs
+  teamARating      Float
+  teamBRating      Float
+  ratingDifference Float
+}
