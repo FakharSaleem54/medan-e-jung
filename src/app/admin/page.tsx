@@ -59,6 +59,12 @@ export default async function AdminDashboard() {
             <div className="font-bold text-xl">Manage Players</div>
           </div>
         </Link>
+        <Link href="/admin/matches" className="glass-panel p-6 hover:border-gaming-accent transition-colors flex items-center justify-center min-h-[150px]">
+          <div className="text-center">
+            <div className="text-4xl mb-2">📋</div>
+            <div className="font-bold text-xl">Manage Matches</div>
+          </div>
+        </Link>
         <Link href="/" className="glass-panel p-6 hover:border-gaming-accent transition-colors flex items-center justify-center min-h-[150px]">
           <div className="text-center">
             <div className="text-4xl mb-2">⚔️</div>
