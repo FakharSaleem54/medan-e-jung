@@ -27,21 +27,32 @@ export async function POST(request: Request) {
       },
     });
 
+    // Fetch all existing players once for fuzzy matching
+    const allPlayers = await prisma.player.findMany();
+
+    // Normalize: lowercase, remove special chars/accents, trim
+    const normalize = (s: string) =>
+      s
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // strip accents
+        .replace(/[^a-z0-9]/g, "")        // keep only alphanumeric
+        .trim();
+
     // For each player in the scorecard, find or create a Player record by displayName
     for (const p of players) {
       const kills = Number(p.kills) || 0;
       const deaths = Number(p.deaths) || 0;
       const kd = deaths > 0 ? kills / deaths : kills;
 
-      // Find existing player by displayName (case-insensitive) or nickname
-      let player = await prisma.player.findFirst({
-        where: {
-          OR: [
-            { displayName: { equals: p.name } },
-            { nickname: { equals: p.name } },
-          ],
-        },
-      });
+      const normalizedExtracted = normalize(p.name);
+
+      // Find existing player by fuzzy normalized name match
+      let player = allPlayers.find(
+        (existing) =>
+          normalize(existing.displayName) === normalizedExtracted ||
+          (existing.nickname && normalize(existing.nickname) === normalizedExtracted)
+      ) ?? null;
 
       // If no player found, auto-create one
       if (!player) {
@@ -52,6 +63,7 @@ export async function POST(request: Request) {
             active: true,
           },
         });
+        allPlayers.push(player); // keep local list in sync for subsequent iterations
       }
 
       await prisma.matchPlayer.create({
