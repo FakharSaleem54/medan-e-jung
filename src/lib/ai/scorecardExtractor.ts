@@ -57,7 +57,7 @@ export class GeminiScorecardExtractor implements ScorecardExtractor {
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
         const response = await ai.models.generateContent({
-          model: "gemini-3.6-flash",
+          model: "gemini-3.5-flash",
           contents: [
             {
               role: "user",
