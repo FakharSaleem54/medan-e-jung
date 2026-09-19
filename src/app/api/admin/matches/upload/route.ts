@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth/session";
 import { scorecardExtractor } from "@/lib/ai/scorecardExtractor";
 
+export const maxDuration = 60; // Allow up to 60 seconds for AI processing
+
+
 export async function POST(request: Request) {
   const isAuth = await isAuthenticated();
   if (!isAuth) {

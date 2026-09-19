@@ -44,8 +44,9 @@ export default function AdminUploadPage() {
       } else {
         alert("Failed to extract data: " + result.error);
       }
-    } catch {
-      alert("An error occurred during extraction.");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      alert(`Network or Server Error during extraction:\n\n${msg}\n\nThis usually happens if the server times out (takes longer than 10s) or the image is too large.`);
     } finally {
       setProcessing(false);
     }
