@@ -2,12 +2,13 @@ import { prisma } from "@/lib/db/prisma";
 import { calculatePlayerRating } from "@/lib/balancing/playerRating";
 import { generateBalancedTeams } from "@/lib/balancing/teamBalancer";
 import Link from "next/link";
+import PlayerStatusModal from "@/components/PlayerStatusModal";
 
 export const revalidate = 0;
 
 export default async function Home() {
-  const players = await prisma.player.findMany({
-    where: { active: true },
+  const allPlayers = await prisma.player.findMany({
+    orderBy: { displayName: "asc" },
     include: {
       matches: {
         include: { match: true },
@@ -16,13 +17,15 @@ export default async function Home() {
     },
   });
 
+  const activePlayers = allPlayers.filter((p) => p.active);
+
   const recentMatches = await prisma.match.findMany({
     orderBy: { playedAt: "desc" },
     take: 3,
     include: { players: { include: { player: true } } },
   });
 
-  const playerRatings = players
+  const playerRatings = activePlayers
     .map((p) => {
       const matches = p.matches.map((m) => ({
         kills: m.kills,
@@ -97,12 +100,21 @@ export default async function Home() {
           >
             ⚔ Today&apos;s Squads
           </h2>
-          <Link
-            href="/"
-            className="btn-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm shrink-0"
-          >
-            ↻ Regenerate
-          </Link>
+          <div className="flex items-center gap-2">
+            <PlayerStatusModal
+              players={allPlayers.map((p) => ({
+                id: p.id,
+                name: p.displayName,
+                active: p.active,
+              }))}
+            />
+            <Link
+              href="/"
+              className="btn-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm shrink-0"
+            >
+              ↻ Regenerate
+            </Link>
+          </div>
         </div>
 
         {best ? (

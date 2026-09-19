@@ -4,7 +4,7 @@ import { createSession } from "@/lib/auth/session";
 export async function POST(request: Request) {
   try {
     const { password } = await request.json();
-    const ADMIN_SECRET = process.env.ADMIN_SECRET || "default_family_secret";
+    const ADMIN_SECRET = process.env.ADMIN_PASSWORD || "default_family_secret";
 
     if (password === ADMIN_SECRET) {
       await createSession();
