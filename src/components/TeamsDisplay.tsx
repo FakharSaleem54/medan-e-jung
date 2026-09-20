@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BalancedTeamsOption, PlayerWithRating } from "@/lib/balancing/teamBalancer";
 
 export default function TeamsDisplay({ initialTeams }: { initialTeams: BalancedTeamsOption }) {
   const [teamA, setTeamA] = useState<PlayerWithRating[]>(initialTeams.teamA);
   const [teamB, setTeamB] = useState<PlayerWithRating[]>(initialTeams.teamB);
+
+  useEffect(() => {
+    setTeamA(initialTeams.teamA);
+    setTeamB(initialTeams.teamB);
+  }, [initialTeams]);
 
   const movePlayer = (player: PlayerWithRating, from: "A" | "B") => {
     if (from === "A") {
