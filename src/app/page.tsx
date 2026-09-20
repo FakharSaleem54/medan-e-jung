@@ -3,6 +3,7 @@ import { calculatePlayerRating } from "@/lib/balancing/playerRating";
 import { generateBalancedTeams } from "@/lib/balancing/teamBalancer";
 import Link from "next/link";
 import PlayerStatusModal from "@/components/PlayerStatusModal";
+import TeamsDisplay from "@/components/TeamsDisplay";
 
 export const revalidate = 0;
 
@@ -118,102 +119,7 @@ export default async function Home() {
         </div>
 
         {best ? (
-          <>
-            <div className="flex flex-col md:flex-row gap-4 scan-sweep">
-              {/* TEAM A */}
-              <div className="team-card-a flex-1 rounded p-0 overflow-hidden">
-                <div className="bg-team-a/20 px-4 py-3 border-b border-team-a/30 flex justify-between items-center">
-                  <span
-                    className="font-black tracking-[0.25em] text-blue-300"
-                    style={{ fontFamily: "Orbitron, sans-serif" }}
-                  >
-                    ALPHA
-                  </span>
-                  <span className="text-xs text-blue-400 font-mono">{best.teamARating} pts</span>
-                </div>
-                <div className="p-4 space-y-3">
-                  {best.teamA.map((p, i) => (
-                    <div key={p.id} className="flex items-center gap-3">
-                      <span className="text-blue-500 text-xs font-mono w-4">{i + 1}</span>
-                      <span className="flex-1 font-bold tracking-wide text-blue-100">{p.name}</span>
-                      <div className="text-right">
-                        <div className="text-gaming-accent font-mono text-sm font-bold">{p.rating}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="px-4 pb-3">
-                  <div className="rating-bar" style={{ width: `${Math.min((best.teamARating / (best.teamARating + best.teamBRating)) * 100, 100)}%` }} />
-                </div>
-              </div>
-
-              {/* VS DIVIDER */}
-              <div className="flex items-center justify-center">
-                <div className="flex flex-col items-center gap-1 md:gap-3">
-                  <div className="w-px h-8 md:h-16 bg-gradient-to-b from-transparent via-gaming-accent to-transparent hidden md:block" />
-                  <span
-                    className="text-2xl md:text-3xl font-black italic text-gaming-accent pulse-glow px-4 py-2"
-                    style={{ fontFamily: "Orbitron, sans-serif", textShadow: "0 0 20px rgba(255,102,0,0.8)" }}
-                  >
-                    VS
-                  </span>
-                  <div className="w-px h-8 md:h-16 bg-gradient-to-b from-transparent via-gaming-accent to-transparent hidden md:block" />
-                </div>
-              </div>
-
-              {/* TEAM B */}
-              <div className="team-card-b flex-1 rounded p-0 overflow-hidden">
-                <div className="bg-team-b/20 px-4 py-3 border-b border-team-b/30 flex justify-between items-center">
-                  <span
-                    className="font-black tracking-[0.25em] text-red-300"
-                    style={{ fontFamily: "Orbitron, sans-serif" }}
-                  >
-                    BRAVO
-                  </span>
-                  <span className="text-xs text-red-400 font-mono">{best.teamBRating} pts</span>
-                </div>
-                <div className="p-4 space-y-3">
-                  {best.teamB.map((p, i) => (
-                    <div key={p.id} className="flex items-center gap-3">
-                      <span className="text-red-500 text-xs font-mono w-4">{i + 1}</span>
-                      <span className="flex-1 font-bold tracking-wide text-red-100">{p.name}</span>
-                      <div className="text-right">
-                        <div className="text-gaming-accent font-mono text-sm font-bold">{p.rating}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="px-4 pb-3">
-                  <div className="rating-bar" style={{ width: `${Math.min((best.teamBRating / (best.teamARating + best.teamBRating)) * 100, 100)}%` }} />
-                </div>
-              </div>
-            </div>
-
-            {/* Balance meter */}
-            <div className="glass-panel px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <span className="text-military-khaki text-xs tracking-widest uppercase">Balance Diff</span>
-                <span className="font-mono text-gaming-accent font-bold">{best.ratingDifference} pts</span>
-              </div>
-              <div className="flex-1 max-w-xs">
-                <div className="h-2 bg-black/40 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${best.balancePercentage}%`,
-                      background: "linear-gradient(90deg, #cc4400, #ffaa00, #44cc00)",
-                    }}
-                  />
-                </div>
-              </div>
-              <span
-                className="text-sm font-bold tracking-widest uppercase"
-                style={{ color: best.ratingDifference <= 5 ? "#44dd00" : "#ffaa00" }}
-              >
-                {best.ratingDifference <= 5 ? "▲ EXCELLENT BALANCE" : "● CLOSE MATCH"}
-              </span>
-            </div>
-          </>
+          <TeamsDisplay initialTeams={best} />
         ) : (
           <div className="glass-panel p-8 text-center text-military-khaki tracking-widest">
             — NO ACTIVE PLAYERS — Upload match data to begin
