@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/prisma";
 import { calculatePlayerRating } from "@/lib/balancing/playerRating";
 import { generateBalancedTeams } from "@/lib/balancing/teamBalancer";
+import { autoBalanceTeams } from "@/app/actions/teamActions";
 import Link from "next/link";
 import PlayerStatusModal from "@/components/PlayerStatusModal";
 import TeamsDisplay from "@/components/TeamsDisplay";
@@ -40,7 +41,45 @@ export default async function Home() {
     .sort((a, b) => b.rating - a.rating);
 
   const options = generateBalancedTeams(playerRatings);
-  const best = options[0];
+  let best = options[0];
+
+  const latestGeneration = await prisma.teamGeneration.findFirst({
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (best && latestGeneration) {
+    const activePlayerIds = playerRatings.map((p) => p.id).sort().join(",");
+    let savedPlayerIds = "";
+    try {
+      savedPlayerIds = JSON.parse(latestGeneration.players).sort().join(",");
+    } catch (e) {}
+
+    if (savedPlayerIds === activePlayerIds) {
+      // The roster matches! Reconstruct `best` from the saved generation
+      try {
+        const savedTeamAIds = new Set<string>(JSON.parse(latestGeneration.teamA));
+        const savedTeamBIds = new Set<string>(JSON.parse(latestGeneration.teamB));
+
+        best = {
+          teamA: playerRatings.filter((p) => savedTeamAIds.has(p.id)),
+          teamB: playerRatings.filter((p) => savedTeamBIds.has(p.id)),
+          teamARating: latestGeneration.teamARating,
+          teamBRating: latestGeneration.teamBRating,
+          ratingDifference: latestGeneration.ratingDifference,
+          balancePercentage: Number(
+            (
+              100 -
+              (latestGeneration.ratingDifference /
+                Math.max(latestGeneration.teamARating, latestGeneration.teamBRating, 1)) *
+                100
+            ).toFixed(2)
+          ),
+        };
+      } catch (e) {
+        console.error("Failed to parse saved teams", e);
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col px-3 sm:px-4 py-4 w-full max-w-4xl mx-auto space-y-6 sm:space-y-8">
@@ -109,12 +148,14 @@ export default async function Home() {
                 active: p.active,
               }))}
             />
-            <Link
-              href="/"
-              className="btn-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm shrink-0"
-            >
-              ↻ Regenerate
-            </Link>
+            <form action={autoBalanceTeams}>
+              <button
+                type="submit"
+                className="btn-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm shrink-0"
+              >
+                ↻ Auto-Balance
+              </button>
+            </form>
           </div>
         </div>
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { BalancedTeamsOption, PlayerWithRating } from "@/lib/balancing/teamBalancer";
+import { saveTeams } from "@/app/actions/teamActions";
 
 export default function TeamsDisplay({ initialTeams }: { initialTeams: BalancedTeamsOption }) {
   const [teamA, setTeamA] = useState<PlayerWithRating[]>(initialTeams.teamA);
@@ -12,14 +13,32 @@ export default function TeamsDisplay({ initialTeams }: { initialTeams: BalancedT
     setTeamB(initialTeams.teamB);
   }, [initialTeams]);
 
+  const [isPending, startTransition] = useTransition();
+
   const movePlayer = (player: PlayerWithRating, from: "A" | "B") => {
+    let newTeamA = teamA;
+    let newTeamB = teamB;
+    
     if (from === "A") {
-      setTeamA((prev) => prev.filter((p) => p.id !== player.id));
-      setTeamB((prev) => [...prev, player]);
+      newTeamA = teamA.filter((p) => p.id !== player.id);
+      newTeamB = [...teamB, player];
+      setTeamA(newTeamA);
+      setTeamB(newTeamB);
     } else {
-      setTeamB((prev) => prev.filter((p) => p.id !== player.id));
-      setTeamA((prev) => [...prev, player]);
+      newTeamB = teamB.filter((p) => p.id !== player.id);
+      newTeamA = [...teamA, player];
+      setTeamB(newTeamB);
+      setTeamA(newTeamA);
     }
+
+    const newTeamARating = Math.round(newTeamA.reduce((sum, p) => sum + p.rating, 0));
+    const newTeamBRating = Math.round(newTeamB.reduce((sum, p) => sum + p.rating, 0));
+    const newDiff = Math.abs(newTeamARating - newTeamBRating);
+    const allIds = [...newTeamA, ...newTeamB].map(p => p.id);
+
+    startTransition(() => {
+      saveTeams(allIds, newTeamA.map(p => p.id), newTeamB.map(p => p.id), newTeamARating, newTeamBRating, newDiff);
+    });
   };
 
   const teamARating = Math.round(teamA.reduce((sum, p) => sum + p.rating, 0));
